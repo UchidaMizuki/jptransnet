@@ -2,5 +2,9 @@
 
 export(transport_network)
 export(transport_network_distance)
+export(transport_network_path)
+importFrom(rlang,.data)
+importFrom(rlang,.env)
 importFrom(vctrs,vec_check_size)
 importFrom(vctrs,vec_size)
+importFrom(vctrs,vec_slice)
