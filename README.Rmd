@@ -1,0 +1,86 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%",
+  dev = "ragg_png"
+)
+```
+
+# jptransnet
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of jptransnet is to ...
+
+## Installation
+
+You can install the development version of jptransnet from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("UchidaMizuki/jptransnet")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example, message=FALSE, warning=FALSE}
+library(jptransnet)
+library(tidyverse)
+library(sf)
+library(sfnetworks)
+```
+
+### `transport_network()`
+
+- Source: https://www.gsi.go.jp/kankyochiri/gm_japan_e.html
+- Terms of use: https://www.gsi.go.jp/ENGLISH/page_e30286.html
+
+```{r}
+# pak::pak("uchidamizuki/jptransnetdata")
+network <- transport_network()
+network
+```
+
+### `transport_network_distance()`
+
+```{r}
+prefecture <- rnaturalearth::ne_states("japan") |> 
+  arrange(iso_3166_2) |> 
+  select(iso_3166_2, name)
+centroid_prefecture <- st_centroid(prefecture)
+
+distance <- network |> 
+  transport_network_distance(from = centroid_prefecture,
+                             to = centroid_prefecture)
+distance[1:5, 1:5]
+```
+
+### `transport_network_path()`
+
+```{r}
+path <- network |> 
+  transport_network_path(from = centroid_prefecture[13, ],
+                         to = centroid_prefecture)
+path
+
+path |> 
+  select(edges) |> 
+  unnest(edges) |> 
+  st_as_sf() |> 
+  ggplot() +
+  geom_sf(data = prefecture) +
+  geom_sf(data = centroid_prefecture,
+          color = "red") +
+  geom_sf(color = "blue")
+```
